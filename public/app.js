@@ -393,6 +393,13 @@ function adminBilling(){
   </div>
 
   <div class="section">
+    <div class="section-head"><h3>All bills</h3></div>
+    <div class="card table-wrap">
+      ${billsTableHTML()}
+    </div>
+  </div>
+
+  <div class="section">
     <div class="section-head"><h3>Tax on apartment complex</h3></div>
     <div class="card">
       <div class="field-row">
@@ -409,6 +416,25 @@ function adminBilling(){
     </div>
   </div>
   `;
+}
+
+function billsTableHTML(){
+  const bills = [...DATA.bills].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if(bills.length===0) return emptyState('receipt','No bills generated yet — use the forms above to generate rent, water or electricity bills.');
+  const rows = bills.map(b=>{
+    const t = tenantById(b.tenantId);
+    const u = t ? unitById(t.unitId) : null;
+    return `<tr>
+      <td>${t?t.name:'—'}${u?` (${u.label})`:''}</td>
+      <td style="text-transform:capitalize;">${b.type}${b.usage?` (${b.usage} units)`:''}</td>
+      <td>${b.period}</td>
+      <td>${fmtDate(b.dueDate)}</td>
+      <td class="mono">${money(b.amount)}</td>
+      <td><span class="badge badge-${b.status}">${b.status}</span></td>
+      <td><button class="btn btn-sm" data-action="delete-bill" data-id="${b.id}" title="Remove this bill">${icon('x')}</button></td>
+    </tr>`;
+  }).join('');
+  return `<table><thead><tr><th>Tenant</th><th>Type</th><th>Period</th><th>Due</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function nextMonthLabel(){
@@ -748,6 +774,12 @@ function handleAction(action,el){
     const t=tenantById(id);
     if(t){ const u=unitById(t.unitId); if(u){u.status='vacant';u.tenantId=null;} }
     DATA.tenants=DATA.tenants.filter(x=>x.id!==id);
+    persist(); render(); return;
+  }
+
+  if(action==='delete-bill'){
+    const id=el.getAttribute('data-id');
+    DATA.bills = DATA.bills.filter(b=>b.id!==id);
     persist(); render(); return;
   }
 

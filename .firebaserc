@@ -3,8 +3,7 @@
     "default": "moriasi-manage",
     "moriasi-manage": "moriasi-manage",
     "manage-moriasi": "moriasi-manage",
-    "portfolio": "mike-moriasi-portfolio",
-    "moriasi manage": "moriasi-manage"
+    "portfolio": "mike-moriasi-portfolio"
   },
   "targets": {},
   "etags": {}
