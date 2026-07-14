@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The whole app's data lives in one document: appData/main
+    // Any signed-in visitor (including anonymous sign-in) can read/write it.
+    // This is intentionally simple. For real production use with separate
+    // admin vs tenant permissions, split this into per-collection rules
+    // keyed off a custom auth claim (e.g. request.auth.token.role == 'admin').
+    match /appData/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
