@@ -1,9 +1,6 @@
 {
   "projects": {
-    "default": "moriasi-manage",
-    "moriasi-manage": "moriasi-manage",
-    "manage-moriasi": "moriasi-manage",
-    "portfolio": "mike-moriasi-portfolio"
+    "default": "moriasi-manage"
   },
   "targets": {},
   "etags": {}
