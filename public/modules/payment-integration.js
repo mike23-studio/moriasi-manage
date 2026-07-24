@@ -27,7 +27,7 @@
    - Set PAYSTACK_PUBLIC_KEY below (safe to expose in the browser).
    ============================================================ */
 
-const BACKEND_URL = 'https://moriasi-manage.onrender.com/'; // e.g. https://moriasi-payments.onrender.com
+const BACKEND_URL = 'https://moriasi-manage.onrender.com'; // e.g. https://moriasi-payments.onrender.com
 const PAYSTACK_PUBLIC_KEY = 'pk_test_3b0ea039e24b61dd665d1b906bb892d0b2ad7211';
 
 function waitForBridge(){
