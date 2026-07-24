@@ -1,0 +1,19 @@
+{
+  "name": "moriasi-payments-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone payments backend for Moriasi Manage: proxies Paystack for M-Pesa STK Push and Card payments.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  }
+}

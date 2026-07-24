@@ -960,3 +960,32 @@ function handleAction(action,el){
       + (e && e.message ? e.message : e) + '</span></div>';
   }
 })();
+
+/* ============================================================
+   ADD-ON BRIDGE — paste this block onto the END of public/app.js
+   ------------------------------------------------------------
+   Nothing above this line needs to change. This block only EXPOSES
+   the app's existing internals (DATA, state, render, persist, and a
+   few helpers) on `window`, so separate add-on modules
+   (public/modules/*.js) can hook into the app without you having to
+   edit any of the existing code, functions, or UI above.
+
+   It does not change any behavior by itself — it only makes things
+   readable/callable from outside this file.
+   ============================================================ */
+window.MoriasiBridge = {
+  getData: () => DATA,
+  setData: (d) => { DATA = d; },
+  state,
+  render,
+  persist,
+  uid,
+  money,
+  todayStr,
+  fmtDate,
+  tenantById,
+  unitById,
+  currentTenant,
+};
+window.dispatchEvent(new CustomEvent('moriasi:bridge-ready'));
+
