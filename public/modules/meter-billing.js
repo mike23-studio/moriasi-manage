@@ -33,15 +33,33 @@ function waitForBridge(){
   });
 }
 
+// The bridge object can exist before Firestore has actually finished
+// loading DATA (loadData() is async). Wait until getData() returns
+// something real before touching it.
+function waitForData(bridge){
+  return new Promise((resolve)=>{
+    const check = ()=>{
+      const d = bridge.getData();
+      if(d){ resolve(); return; }
+      setTimeout(check, 50);
+    };
+    check();
+  });
+}
+
 (async function init(){
   const bridge = await waitForBridge();
-  const DATA = bridge.getData();
+  await waitForData(bridge);
 
-  // ---------- one-time migration: create meters/meterReadings arrays ----------
-  if(!DATA.meters) DATA.meters = [];
-  if(!DATA.meterReadings) DATA.meterReadings = [];
+  function ensureArrays(){
+    const DATA = bridge.getData();
+    if(!DATA.meters) DATA.meters = [];
+    if(!DATA.meterReadings) DATA.meterReadings = [];
+    return DATA;
+  }
 
   function ensureMeter(unitId, type){
+    const DATA = ensureArrays();
     let m = DATA.meters.find(x=>x.unitId===unitId && x.type===type);
     if(!m){
       const prefix = type==='water' ? 'W' : 'E';
@@ -58,6 +76,7 @@ function waitForBridge(){
   }
 
   function seedMetersFromExistingTenants(){
+    const DATA = ensureArrays();
     let changed = false;
     DATA.units.forEach(u=>{
       const wm = ensureMeter(u.id, 'water');
@@ -73,11 +92,10 @@ function waitForBridge(){
     return changed;
   }
   const seeded = seedMetersFromExistingTenants();
-  if(seeded || DATA.meters.length){ bridge.persist(); }
-
-  function meterFor(unitId, type){ return DATA.meters.find(x=>x.unitId===unitId && x.type===type); }
+  if(seeded || ensureArrays().meters.length){ bridge.persist(); }
 
   function generateFromMeters(type){
+    const DATA = ensureArrays();
     const isWater = type==='water';
     const periodEl = document.getElementById(isWater?'water-period':'electric-period');
     const rateEl = document.getElementById(isWater?'water-rate':'electric-rate');
@@ -141,11 +159,13 @@ function waitForBridge(){
   // ---------- meter registry panel injected into the "Meter readings" screen ----------
   function unitLabel(unitId){ const u = bridge.unitById(unitId); return u ? u.label : unitId; }
   function tenantNameForUnit(unitId){
+    const DATA = bridge.getData();
     const t = DATA.tenants.find(x=>x.unitId===unitId);
     return t ? t.name : '— vacant —';
   }
 
   function registryPanelHTML(){
+    const DATA = bridge.getData();
     const rows = DATA.meters
       .slice()
       .sort((a,b)=> unitLabel(a.unitId).localeCompare(unitLabel(b.unitId)) || a.type.localeCompare(b.type))
@@ -185,6 +205,7 @@ function waitForBridge(){
   function bindRegistryEvents(container){
     container.querySelectorAll('.moriasi-meter-num').forEach(inp=>{
       inp.addEventListener('change', ()=>{
+        const DATA = bridge.getData();
         const meter = DATA.meters.find(m=>m.id===inp.getAttribute('data-meter'));
         if(meter){ meter.meterNumber = inp.value.trim(); bridge.persist(); }
       });
