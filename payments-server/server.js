@@ -53,12 +53,11 @@ async function paystack(path, options={}){
 }
 
 function normalizePhone(phone){
-  // Accepts formats like 07xx xxx xxx, +2547xx xxx xxx, 2547xx xxx xxx
   const digits = phone.replace(/\D/g,'');
-  if(digits.startsWith('254')) return digits;
-  if(digits.startsWith('0')) return '254' + digits.slice(1);
-  if(digits.startsWith('7') || digits.startsWith('1')) return '254' + digits;
-  return digits;
+  if(digits.startsWith('254')) return '+' + digits;
+  if(digits.startsWith('0')) return '+254' + digits.slice(1);
+  if(digits.startsWith('7') || digits.startsWith('1')) return '+254' + digits;
+  return '+' + digits;
 }
 
 // Webhook needs the raw body for signature verification, so give it its
